@@ -1,3 +1,7 @@
+// CPSC 441 Assignment 3
+// Eugene Lee - 30137489
+// TCP & UDP - Vowelizer (server)
+
 #include <iostream>
 #include <unistd.h>
 #include <sys/socket.h>
