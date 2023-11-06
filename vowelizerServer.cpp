@@ -20,10 +20,13 @@ int main() {
     bind(server_fd, (struct sockaddr*)&address, alen);
     listen(server_fd, 3); //max 3 clients
 
-    int accepted = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&alen);
-    char buffer[1024] = {0};
-    read(accepted, buffer, 1024);
-    cout << "Received: " << buffer << endl;
+    while (1) {
+        int accepted = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&alen);
+        char buffer[1024] = {0};
+        read(accepted, buffer, 1024);
+        cout << "Received: " << buffer << endl;
+    }
+    
     close(server_fd);
 
     return 0;

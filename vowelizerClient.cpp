@@ -8,10 +8,16 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include <cstdlib> //can i use this to use exit()?
+
 //define port to use
 #define PORT 8080
 
 using namespace std;
+
+//function declaration
+void menuDisplay(int socket);
+
 int main() {
     int client_fd = socket(AF_INET, SOCK_STREAM, 0); //socket to interact with server
     struct sockaddr_in serv_addr; 
@@ -22,6 +28,15 @@ int main() {
 
     connect(client_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)); //connect socket to server
     
+    menuDisplay(client_fd);
+
+    send(client_fd, msg.c_str(), msg.length(), 0); //send data to server
+    cout << "YAY" << endl;
+    return 0;
+}
+
+//function definition
+void menuDisplay(int socket) {
     //menu to display to user
     string menuStr = 
         "Menu Options\n"
@@ -38,27 +53,26 @@ int main() {
     while (true) {
         if (choice == "1") {
             cout << "\nsplitting text (basic)" << endl;
+            menuDisplay(socket);
             break;
         } else if (choice == "2") {
             cout << "\nmerging text (basic)" << endl;
+            menuDisplay(socket);
             break;
         } else if (choice == "3") {
             cout << "\nsplitting text (advanced)" << endl;
+            menuDisplay(socket);
             break;
         } else if (choice == "4") {
             cout << "\nmerging text (advanced)" << endl;
+            menuDisplay(socket);
             break;
         } else if (choice == "5") {
-            cout << "\nquitting" << endl;
-            break;
+            cout << "\nThank you for using vowelizer! See you next time..." << endl;
+            exit(0);
         } else {
             cout << "\nchoose a valid option: ";
             cin >> choice;
         }
     }
-
-
-    send(client_fd, msg.c_str(), msg.length(), 0); //send data to server
-    cout << "YAY" << endl;
-    return 0;
 }
