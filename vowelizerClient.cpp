@@ -16,27 +16,23 @@
 using namespace std;
 
 //function declaration
-void menuDisplay(int socket);
+void menuDisplay();
 
 int main() {
-    int client_fd = socket(AF_INET, SOCK_STREAM, 0); //socket to interact with server
-    struct sockaddr_in serv_addr; 
-    string msg = "Hello from client!";
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT); //port number of socket
-    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr); //IP address of socket
+    menuDisplay();
 
-    connect(client_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)); //connect socket to server
-    
-    menuDisplay(client_fd);
-
-    send(client_fd, msg.c_str(), msg.length(), 0); //send data to server
-    cout << "YAY" << endl;
     return 0;
 }
 
 //function definition
-void menuDisplay(int socket) {
+void menuDisplay() {
+    int client_fd = socket(AF_INET, SOCK_STREAM, 0); //socket to interact with server
+    struct sockaddr_in serv_addr; 
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(PORT); //port number of socket
+    inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr); //IP address of socket   
+    connect(client_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)); //connect socket to server
+    
     //menu to display to user
     string menuStr = 
         "Menu Options\n"
@@ -49,29 +45,54 @@ void menuDisplay(int socket) {
     string choice;
     cout << "Connection successful!\n\n" << menuStr;
     cin >> choice;
-    
+    string splitStr;
+    string mergeVowel;
+    string mergeConsonant;
+
     while (true) {
         if (choice == "1") {
-            cout << "\nsplitting text (basic)" << endl;
-            menuDisplay(socket);
+            cout << "\nSplitting Text (basic encoding)" << endl;
+            cout << "Please enter a string to split into consonants and vowels: ";
+            cin >> splitStr;
+            send(client_fd, splitStr.c_str(), splitStr.length(), 0);
+
+            menuDisplay();
             break;
         } else if (choice == "2") {
-            cout << "\nmerging text (basic)" << endl;
-            menuDisplay(socket);
+            cout << "\nMerging Text (basic encoding)" << endl;
+            cout << "Please enter a consonant string to merge: ";
+            cin >> mergeConsonant;
+            send(client_fd, mergeConsonant.c_str(), mergeConsonant.length(), 0);
+            cout << "Please enter a vowel string to merge: ";
+            cin >> mergeVowel; //send over UDP
+            send(client_fd, mergeVowel.c_str(), mergeVowel.length(), 0);
+
+            menuDisplay();
             break;
         } else if (choice == "3") {
-            cout << "\nsplitting text (advanced)" << endl;
-            menuDisplay(socket);
+            cout << "\nSplitting Text (advanced encoding)" << endl;
+            cout << "Please enter a string to split into consonants and vowels: ";
+            cin >> splitStr;
+            send(client_fd, splitStr.c_str(), splitStr.length(), 0);
+
+            menuDisplay();
             break;
         } else if (choice == "4") {
-            cout << "\nmerging text (advanced)" << endl;
-            menuDisplay(socket);
+            cout << "\nMerging Text (advanced encoding)" << endl;
+            cout << "Please enter a consonant string to merge: ";
+            cin >> mergeConsonant;
+            send(client_fd, mergeConsonant.c_str(), mergeConsonant.length(), 0);
+            cout << "Please enter a vowel string to merge: ";
+            cin >> mergeVowel; //send over UDP
+            send(client_fd, mergeVowel.c_str(), mergeVowel.length(), 0);
+
+            menuDisplay();
             break;
         } else if (choice == "5") {
             cout << "\nThank you for using vowelizer! See you next time..." << endl;
             exit(0);
         } else {
-            cout << "\nchoose a valid option: ";
+            cout << "\nPlease choose a valid option ('1', '2', '3', '4', or '5'): ";
             cin >> choice;
         }
     }
