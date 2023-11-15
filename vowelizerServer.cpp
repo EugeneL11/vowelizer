@@ -8,7 +8,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#define PORT 8080
+#define PORT 9001
 
 using namespace std;
 int main() {
@@ -22,19 +22,25 @@ int main() {
     bind(server_fd, (struct sockaddr*)&address, alen);
     listen(server_fd, 3); //max 3 clients
 
-    while (1) {
-        cout << "Waiting for new connection..." << endl;
-        
-        int accepted = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&alen);
-        cout << "Connection accepted!" << endl;
-
-        char buffer[1024] = {0};
-        recv(accepted, buffer, sizeof(buffer), 0);
-        cout << "Received: " << buffer << endl;
-
-        close(accepted);
-    }
+    cout << "Waiting for new connection..." << endl;
     
+    int accepted = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&alen);
+    cout << "Connection accepted!" << endl;
+
+    char buffer[1024] = {0};
+    int bytesRec = 0;
+
+    while (1) {
+        bytesRec = recv(accepted, buffer, sizeof(buffer), 0);
+        cout << "Received: " << buffer << endl;
+        string recStr(buffer, bytesRec);
+        if (recStr == "Exiting...") {
+            break;
+        }
+        // Clear the buffer to prepare for the next chunk
+        memset(buffer, 0, sizeof(buffer));
+    }
+    close(accepted);
     close(server_fd);
 
     return 0;
