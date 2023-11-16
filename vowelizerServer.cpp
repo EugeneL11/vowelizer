@@ -18,19 +18,38 @@ using namespace std;
 int main() {
     //for TCP socket
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd == 0) { 
+        perror("Socket failed");
+        exit(EXIT_FAILURE);
+    } 
     struct sockaddr_in address;
     int alen = sizeof(address);
     address.sin_family = AF_INET; //for IPv4
     inet_pton(AF_INET, IP1, &(address.sin_addr));
     address.sin_port = htons(PORT1);
-    bind(server_fd, (struct sockaddr*)&address, alen);
-    listen(server_fd, 3); //max 3 clients
+    if (bind(server_fd, (struct sockaddr*)&address, alen) < 0) {
+        perror("Bind failed");
+        exit(EXIT_FAILURE);
+    }
+    //max 3 clients
+    if (listen(server_fd, 3) < 0) {
+        perror("Listen failed");
+        exit(EXIT_FAILURE);
+    }
     cout << "Waiting for new TCP connection..." << endl;
     int accepted = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&alen);
+    if (accepted < 0) {
+        perror("Accept failed");
+        exit(EXIT_FAILURE);
+    }
     cout << "TCP Connection accepted!" << endl;
 
     //for UDP socket
     int udpSock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (udpSock == -1) {
+        std::cout << "Failed to create UDP socket" << endl;
+        return -1;
+    }
     struct sockaddr_in udpAddr;
     udpAddr.sin_family = AF_INET;
     udpAddr.sin_addr.s_addr = INADDR_ANY;
@@ -40,6 +59,16 @@ int main() {
         return -1;
     }
     cout << "UDP Bind Successful!" << endl;
+
+    // Set receive timeout
+    struct timeval timeout;
+    timeout.tv_sec = 3;
+    timeout.tv_usec = 0;
+    if (setsockopt(udpSock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+        perror("Error setting receive timeout");
+        close(udpSock);
+        return EXIT_FAILURE;
+    }
 
     while (1) {
         //initialize variables
@@ -73,6 +102,11 @@ int main() {
             send(accepted, consonantStr.c_str(), consonantStr.length(), 0);
             //receive dummy message to resolve client address for UDP
             ssize_t udpBytesRec = recvfrom(udpSock, buffer2, sizeof(buffer2), 0, (struct sockaddr*)&clientAddr, &clientAddrLen);
+            //check for timeout 
+            if (udpBytesRec < 0) {
+                cout << "UDP Socket Timeout!" << endl;
+                continue;
+            }
             //send vowel string using UDP
             ssize_t bytesSent = sendto(udpSock, vowelStr.c_str(), vowelStr.length(), 0, (struct sockaddr *)&clientAddr, sizeof(clientAddr));
         }
@@ -83,6 +117,11 @@ int main() {
             cout << "Consonant String: " << recStr << endl;
             //receive vowel string
             ssize_t udpBytesRec = recvfrom(udpSock, buffer2, sizeof(buffer2), 0, nullptr, nullptr);
+            //check for timeout 
+            if (udpBytesRec < 0) {
+                cout << "UDP Socket Timeout!" << endl;
+                continue;
+            }
             cout << "Vowel String: " << buffer2 << endl;
             string vowel(buffer2); //convert to string
             //loop through the consonant string
@@ -121,6 +160,11 @@ int main() {
             send(accepted, consonantStr.c_str(), consonantStr.length(), 0);
             //receive dummy message to resolve client address for UDP
             ssize_t udpBytesRec = recvfrom(udpSock, buffer2, sizeof(buffer2), 0, (struct sockaddr*)&clientAddr, &clientAddrLen);
+            //check for timeout 
+            if (udpBytesRec < 0) {
+                cout << "UDP Socket Timeout!" << endl;
+                continue;
+            }
             //send vowel string using UDP
             ssize_t bytesSent = sendto(udpSock, vowelStr.c_str(), vowelStr.length(), 0, (struct sockaddr *)&clientAddr, sizeof(clientAddr));
         }
@@ -130,6 +174,11 @@ int main() {
             consonantStr = recStr.erase(0, 4); //remove identifier now
             cout << "Consonant String: " << consonantStr << endl;
             ssize_t udpBytesRec = recvfrom(udpSock, buffer2, sizeof(buffer2), 0, nullptr, nullptr);
+            //check for timeout 
+            if (udpBytesRec < 0) {
+                cout << "UDP Socket Timeout!" << endl;
+                continue;
+            }
             cout << "Vowel String: " << buffer2 << endl;
             string vowel(buffer2); //convert to string
             string mergedStr = "";

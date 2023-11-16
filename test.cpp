@@ -20,18 +20,40 @@ using namespace std;
 int main() {
     //TCP socket
     int tcpSock = socket(AF_INET, SOCK_STREAM, 0); //socket to interact with server
+    if (tcpSock == 0) { 
+        perror("Socket failed");
+        exit(EXIT_FAILURE);
+    } 
     struct sockaddr_in serv_addr; 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT1); //port number of socket
     inet_pton(AF_INET, IP1, &serv_addr.sin_addr); //IP address of socket   
-    connect(tcpSock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)); //connect socket to server
+    int status = connect(tcpSock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)); //connect socket to server
+    if (status == -1) {
+        perror("Connection failed");
+        exit(EXIT_FAILURE);
+    }
 
     //UDP socket
     int udpSock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (udpSock == -1) {
+        std::cout << "Failed to create UDP socket" << endl;
+        return -1;
+    }
     struct sockaddr_in serv_addr2;
     serv_addr2.sin_family = AF_INET;
     serv_addr2.sin_port = htons(PORT2);
     serv_addr2.sin_addr.s_addr = inet_addr(IP1);
+
+    // Set receive timeout
+    struct timeval timeout;
+    timeout.tv_sec = 3;
+    timeout.tv_usec = 0;
+    if (setsockopt(udpSock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+        perror("Error setting receive timeout");
+        close(udpSock);
+        return EXIT_FAILURE;
+    }
 
     while (true) {
         //menu to display to user
@@ -76,6 +98,11 @@ int main() {
             bytesRec = recv(tcpSock, buffer, sizeof(buffer), 0); //receive consonant string over TCP
             cout << "Split Consonant String (Basic): " << buffer << endl;
             ssize_t udpBytesRec = recvfrom(udpSock, buffer2, sizeof(buffer2), 0, nullptr, nullptr); //receive vowel string over UDP
+            //check for timeout
+            if (udpBytesRec < 0) {
+                cout << "UDP Socket Timeout!" << endl;
+                continue;
+            }
             cout << "Split Vowel String(Basic): " << buffer2 << endl << endl;
 
         //option two (basic merge)
@@ -117,6 +144,11 @@ int main() {
             bytesRec = recv(tcpSock, buffer, sizeof(buffer), 0); //receive consonant string over TCP
             cout << "Split Consonant String (Advanced): " << buffer << endl;
             ssize_t udpBytesRec = recvfrom(udpSock, buffer2, sizeof(buffer2), 0, nullptr, nullptr); //receive vowel string over UDP
+            //check for timeout 
+            if (udpBytesRec < 0) {
+                cout << "UDP Socket Timeout!" << endl;
+                continue;
+            }
             cout << "Split Vowel String (Advanced): " << buffer2 << endl << endl;
 
         //option four (advanced merge)
@@ -142,7 +174,6 @@ int main() {
         //invalid input
         } else {
             cout << "\nPlease choose a valid option ('1', '2', '3', '4', or '5')" << endl;
-            //cin >> choice;
         }
     }
     //close both sockets
