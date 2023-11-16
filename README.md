@@ -18,7 +18,7 @@ Testing Description:
 - I tested a alot both at school and at home, using my laptop. Since my laptop is Unix, it was not too challenging to make it also work on Linux devices. There seemed to be no difference between testing at home and at the university. I mainly wrote out to the terminal using cout to test my code. By printing out everything, I was able to see which parts are working and which parts aren't. It was a lot of debugging done this way. Being able to locate all the issues helped me understand all the different moving parts of the proxy, and handle all malfunctionalities appropriately.
 
 What Works: 
-- Everything in the vowelizer works as expected. I started off as a TCP-based echo server and built it up from there. I even added some error-handling. I set the UDP timeout to 10 seconds in both the client and the server. It has all the required functionalities of the assignment.
+- Everything in the vowelizer works as expected. I started off as a TCP-based echo server and built it up from there. I even added some error-handling. I set the UDP timeout to 7 seconds in both the client and the server. It has all the required functionalities of the assignment.
 
 What Doesn't Work:
 - There shouldn't be anything that doesn't work. I followed all the instructions.

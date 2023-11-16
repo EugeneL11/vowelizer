@@ -7,6 +7,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <algorithm>
+#include <cstring>
 
 //define port for sockets and IP address
 #define PORT1 9009
@@ -62,7 +64,7 @@ int main() {
 
     // Set receive timeout
     struct timeval timeout;
-    timeout.tv_sec = 5;
+    timeout.tv_sec = 7;
     timeout.tv_usec = 0;
     if (setsockopt(udpSock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
         perror("Error setting receive timeout");
