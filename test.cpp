@@ -11,8 +11,8 @@
 #include <cstdlib> //can i use this to use exit()?
 
 //define port for sockets and IP address
-#define PORT1 9011
-#define PORT2 9012
+#define PORT1 9009
+#define PORT2 9010
 #define IP1 "127.0.0.1"
 
 using namespace std;
@@ -47,7 +47,7 @@ int main() {
 
     // Set receive timeout
     struct timeval timeout;
-    timeout.tv_sec = 3;
+    timeout.tv_sec = 5;
     timeout.tv_usec = 0;
     if (setsockopt(udpSock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
         perror("Error setting receive timeout");
@@ -100,7 +100,7 @@ int main() {
             ssize_t udpBytesRec = recvfrom(udpSock, buffer2, sizeof(buffer2), 0, nullptr, nullptr); //receive vowel string over UDP
             //check for timeout
             if (udpBytesRec < 0) {
-                cout << "UDP Socket Timeout!" << endl;
+                cout << "UDP Socket Timeout!" << endl << endl;
                 continue;
             }
             cout << "Split Vowel String(Basic): " << buffer2 << endl << endl;
@@ -146,7 +146,7 @@ int main() {
             ssize_t udpBytesRec = recvfrom(udpSock, buffer2, sizeof(buffer2), 0, nullptr, nullptr); //receive vowel string over UDP
             //check for timeout 
             if (udpBytesRec < 0) {
-                cout << "UDP Socket Timeout!" << endl;
+                cout << "UDP Socket Timeout!" << endl << endl;
                 continue;
             }
             cout << "Split Vowel String (Advanced): " << buffer2 << endl << endl;
@@ -156,10 +156,10 @@ int main() {
             cout << "\nMerging Text (advanced encoding)" << endl;
             cout << "Please enter a consonant string to merge: ";
             getline(cin, mergeConsonant);
-            mergeConsonant2 = "$am2" + mergeConsonant; //add the identifier
-            send(tcpSock, mergeConsonant2.c_str(), mergeConsonant2.length(), 0); //send consonant string over TCP
             cout << "Please enter a vowel string to merge: ";
             getline(cin, mergeVowel);
+            mergeConsonant2 = "$am2" + mergeConsonant; //add the identifier
+            send(tcpSock, mergeConsonant2.c_str(), mergeConsonant2.length(), 0); //send consonant string over TCP
             //send vowel string over UDP
             ssize_t bytesSent = sendto(udpSock, mergeVowel.c_str(), mergeVowel.length(), 0, (struct sockaddr *)&serv_addr2, sizeof(serv_addr2));
             bytesRec = recv(tcpSock, buffer, sizeof(buffer), 0); //receive merged string over TCP
@@ -173,7 +173,7 @@ int main() {
         
         //invalid input
         } else {
-            cout << "\nPlease choose a valid option ('1', '2', '3', '4', or '5')" << endl;
+            cout << "\nPlease choose a valid option ('1', '2', '3', '4', or '5')" << endl << endl;
         }
     }
     //close both sockets

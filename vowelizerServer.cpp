@@ -9,8 +9,8 @@
 #include <arpa/inet.h>
 
 //define port for sockets and IP address
-#define PORT1 9011
-#define PORT2 9012
+#define PORT1 9009
+#define PORT2 9010
 #define IP1 "127.0.0.1"
 
 using namespace std;
@@ -62,7 +62,7 @@ int main() {
 
     // Set receive timeout
     struct timeval timeout;
-    timeout.tv_sec = 3;
+    timeout.tv_sec = 5;
     timeout.tv_usec = 0;
     if (setsockopt(udpSock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
         perror("Error setting receive timeout");
@@ -104,7 +104,7 @@ int main() {
             ssize_t udpBytesRec = recvfrom(udpSock, buffer2, sizeof(buffer2), 0, (struct sockaddr*)&clientAddr, &clientAddrLen);
             //check for timeout 
             if (udpBytesRec < 0) {
-                cout << "UDP Socket Timeout!" << endl;
+                cout << "UDP Socket Timeout!" << endl << endl;
                 continue;
             }
             //send vowel string using UDP
@@ -119,7 +119,7 @@ int main() {
             ssize_t udpBytesRec = recvfrom(udpSock, buffer2, sizeof(buffer2), 0, nullptr, nullptr);
             //check for timeout 
             if (udpBytesRec < 0) {
-                cout << "UDP Socket Timeout!" << endl;
+                cout << "UDP Socket Timeout!" << endl << endl;
                 continue;
             }
             cout << "Vowel String: " << buffer2 << endl;
@@ -162,7 +162,7 @@ int main() {
             ssize_t udpBytesRec = recvfrom(udpSock, buffer2, sizeof(buffer2), 0, (struct sockaddr*)&clientAddr, &clientAddrLen);
             //check for timeout 
             if (udpBytesRec < 0) {
-                cout << "UDP Socket Timeout!" << endl;
+                cout << "UDP Socket Timeout!" << endl << endl;
                 continue;
             }
             //send vowel string using UDP
@@ -176,7 +176,7 @@ int main() {
             ssize_t udpBytesRec = recvfrom(udpSock, buffer2, sizeof(buffer2), 0, nullptr, nullptr);
             //check for timeout 
             if (udpBytesRec < 0) {
-                cout << "UDP Socket Timeout!" << endl;
+                cout << "UDP Socket Timeout!" << endl << endl;
                 continue;
             }
             cout << "Vowel String: " << buffer2 << endl;
